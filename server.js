@@ -1,5 +1,6 @@
 const dotenv = require('dotenv').config()
 const mysql = require('mysql2');
+const app = require('./app');
 
 
 var connection = mysql.createConnection({
@@ -15,4 +16,9 @@ connection.connect(function(err) {
     }
    
     console.log('connected as id ' + connection.threadId);
-  });
+});
+
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`App running on port ${port} 👍`)
+})
