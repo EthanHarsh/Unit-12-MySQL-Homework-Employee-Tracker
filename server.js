@@ -7,6 +7,7 @@ var connection = mysql.createConnection({
   host     : process.env.DBHOST,
   user     : process.env.USER,
   password : process.env.PASSWORD,
+  multipleStatements: true
 });
  
 connection.connect(function(err) {
@@ -18,4 +19,17 @@ connection.connect(function(err) {
     console.log('connected as id ' + connection.threadId); 
 });
 
-
+try {
+  connection.query(
+    commands.create,
+      (err, results) => {
+        if(err) {
+          console.error(err);
+          return
+        }
+        console.log('Schema created successfully');
+      }
+    )
+} catch(err) {
+  console.error(err);
+}
