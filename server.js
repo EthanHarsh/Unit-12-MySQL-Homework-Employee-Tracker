@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const commands = require('./lib/sqlCommands');
 const inq = require('inquirer');
 const questions = require('./lib/questions');
+const { edit, view } = require('./lib/questions');
 
 
 var connection = mysql.createConnection({
@@ -26,46 +27,9 @@ connection.connect(function(err) {
 console.log('Hello! 👋 😄');
 console.log('Welcome to the employee management systeminator 5000');
 
-function init() {
-  inq.prompt(questions.init)
-  .then((answers) => {
-    //console.log(answers.start);
-    answers = answers.start;
-    if(answers === 'Continue with data') {
-      //console.log('continue')
-      mainLoop();
-    } else {
-      //console.log('else')
-      clearTable();
-      mainLoop();
-    }
-  })
-}
 
-function mainLoop() {
-  inq.prompt(questions.main)
-    .then((answer) => {
-      if(answer.choice === 'View info') {
-        viewLoop();
-      } else {
-        editLoop();
-      }
-    })
-}
 
-function viewLoop() {
-  inq.prompt(questions.view)
-    .then((answer) => {
-      console.log(answer);
-    })
-}
 
-function editLoop() {
-  inq.prompt(questions.edit)
-    .then((answer) => {
-      console.log(answer);
-    })
-}
 
 function clearTable() {
   //console.log('clearTable')
@@ -84,3 +48,48 @@ function clearTable() {
     console.error(err);
   }
 }
+
+//Choice evaluation functions
+function checkAdd(el) {
+  switch (el) {
+
+  }
+}
+
+function checkEdit(el) {
+  switch (el) {
+    case 'Edit Employee':
+      edit.loop();
+      break;
+    case 'Edit Department':
+      edit.department();
+      break;
+    case 'Edit Manager':
+      edit.manager();
+      break;
+    case 'Add New Info':
+      addLoop();
+      break;
+  }
+}
+
+function checkView(el) {
+  switch (el) {
+    case 'View employees':
+      view.employees();
+      break;
+    case 'View employees by department':
+      view.byDept();
+      break;
+    case 'View employees by manager':
+      view.byManager();
+      break;
+    case 'View departments':
+      view.depts();
+      break
+    case 'View roles':
+      view.roles();
+      break
+  }
+}
+
