@@ -1,0 +1,1 @@
+SELECT * FROM employees WHERE role_id = 0

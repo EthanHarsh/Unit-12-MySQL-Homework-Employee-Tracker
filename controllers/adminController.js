@@ -1,7 +1,7 @@
 const connection = require('./../server');
 const commands = require('./../lib/sqlCommands');
 
-exports.clearTable = () => {
+const clearTable = () => {
     //console.log('clearTable')
     try {
       connection.query(
@@ -18,3 +18,9 @@ exports.clearTable = () => {
       console.error(err);
     }
 }
+
+const obj = {
+  clearTable: clearTable
+}
+
+module.exports = obj;
