@@ -1,4 +1,7 @@
 const questions = require('./../lib/questions');
+const eval = require('./evalController');
+const admin = require('./adminController');
+const inq = require('inquirer');
 
 exports.init = () => {
     inq.prompt(questions.init)
@@ -10,7 +13,7 @@ exports.init = () => {
         mainLoop();
       } else {
         //console.log('else')
-        clearTable();
+        admin.clearTable();
         mainLoop();
       }
     })
