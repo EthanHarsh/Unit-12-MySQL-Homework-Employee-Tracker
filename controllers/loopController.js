@@ -132,11 +132,98 @@ function updateEmployeeRole(person, newRoleId) {
 }
 
 function newEmployee() {
-
+  let resultsArr = []
+  let preguntas = questions.newEmployee
+  connection.query(role.getAll,
+    (err, results) => {
+      if(err) {
+        console.error(err)
+      }
+      results.forEach((el) => {
+        resultsArr.push(`${el.title}`)
+      })
+      let newQ = {
+        type: 'list',
+        message: `What role is the new employee working in?`,
+        name: 'role',
+        suffix: ' - ',
+        choices: resultsArr
+      }
+      preguntas.push(newQ)
+      inq.prompt(preguntas)
+      .then((answer) => {
+          //console.log(answer);
+          storeNewEmployee(answer);
+      })
+    })
 }
 
-function newRoles() {
+function storeNewEmployee(answer) {
+  //console.log(answer.dept);
+  const sqlStr = SqlString.format(role.getRoleId, [answer.role]);
+  connection.query(sqlStr,
+    (err, results, fields) => {
+      console.log(results);
+      const sqlStr = SqlString.format(employee.newEmployee, [answer.first, answer.last, results[0].id, answer.manager])
+      connection.query(sqlStr,
+        (err, results) => {
+          if(err) {
+            console.error(err)
+          } else {
+            console.log('New Employee Created!');
+            mainLoop();
+          }
+        })
+    }
+  )
+}
 
+function newRole() {
+  let resultsArr = []
+  let preguntas = questions.newRole
+  connection.query(department.getAll,
+    (err, results) => {
+      if(err) {
+        console.error(err)
+      }
+      results.forEach((el) => {
+        resultsArr.push(`${el.name}`)
+      })
+      let newQ = {
+        type: 'list',
+        message: `What department is the new role under?`,
+        name: 'dept',
+        suffix: ' - ',
+        choices: resultsArr
+      }
+      preguntas.push(newQ)
+      inq.prompt(preguntas)
+      .then((answer) => {
+          //console.log(answer);
+          storeNewRole(answer);
+
+      })
+    })
+}
+
+function storeNewRole(answer) {
+  //console.log(answer.dept);
+  const sqlStr = SqlString.format(department.getDeptId, [answer.dept]);
+  connection.query(sqlStr,
+    (err, results, fields) => {
+      //console.log(results);
+      const sqlStr = SqlString.format(role.newRole, [answer.title, answer.salary, results[0].id])
+      connection.query(sqlStr,
+        (err, results) => {
+          if(err) {
+            console.error(err)
+          } else {
+            console.log('New Role Created!');
+            mainLoop();
+          }
+        })
+    }
+  )
 }
 
 function newDepartment() {
