@@ -2,6 +2,7 @@ const questions = require('./../lib/questions');
 const admin = require('./adminController');
 const inq = require('inquirer');
 var SqlString = require('sqlstring');
+const cTable = require('console.table');
 
 const connection = require('./../server');
 const employee = require('./../lib/employeeSqlCommands');
@@ -34,7 +35,7 @@ module.exports = obj;
 function mainLoop () {
     inq.prompt(questions.main)
       .then((answer) => {
-        if(answer.choice === 'View info') {
+        if(answer.choice === 'View Info') {
           viewLoop();
         } else {
           editLoop();
@@ -309,10 +310,43 @@ function checkEdit (el) {
   }
 }
 
+function viewEmployees() {
+  connection.query(employee.getAll, 
+    (err, results) => {
+      if(err) {
+        console.error(err);
+      }
+      console.table(results);
+      mainLoop();
+    })
+}
+
+function viewRoles() {
+  connection.query(role.getAll, 
+    (err, results) => {
+      if(err) {
+        console.error(err);
+      }
+      console.table(results);
+      mainLoop();
+    })
+}
+
+function viewDepts() {
+  connection.query(department.getAll, 
+    (err, results) => {
+      if(err) {
+        console.error(err);
+      }
+      console.table(results);
+      mainLoop();
+    })
+}
+
 function checkView(el) {
   switch (el) {
     case 'View employees':
-      view.employees();
+      viewEmployees();
       break;
     case 'View employees by department':
       view.byDept();
@@ -323,10 +357,10 @@ function checkView(el) {
       break;
     */
     case 'View departments':
-      view.depts();
+      viewDepts();
       break
     case 'View roles':
-      view.roles();
+      viewRoles();
       break
   }
 }
