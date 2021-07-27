@@ -69,7 +69,7 @@ function editEmployee () {
   let resultsArr = []
   connection.query(employee.getAll,
     (err, results, fields) => {
-        console.log(results);
+        //console.log(results);
         results.forEach((el) => {
           resultsArr.push(`${el.first_name} ${el.last_name}`)
         })
@@ -92,7 +92,7 @@ function editEmployeeRole(person) {
   let resultsArr = []
   connection.query(role.getAll,
     (err, results, fields) => {
-        console.log(results);
+        //console.log(results);
         results.forEach((el) => {
           resultsArr.push(`${el.title}`)
         })
@@ -164,7 +164,7 @@ function storeNewEmployee(answer) {
   const sqlStr = SqlString.format(role.getRoleId, [answer.role]);
   connection.query(sqlStr,
     (err, results, fields) => {
-      console.log(results);
+      //console.log(results);
       const sqlStr = SqlString.format(employee.newEmployee, [answer.first, answer.last, results[0].id, answer.manager])
       connection.query(sqlStr,
         (err, results) => {
