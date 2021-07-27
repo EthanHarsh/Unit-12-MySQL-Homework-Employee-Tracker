@@ -1,0 +1,1 @@
+INSERT INTO tyrell_corp_db.departments (name) VALUES (?);

@@ -11,7 +11,7 @@ const clearTable = () => {
               console.error(err);
               return
             }
-            console.log('Schema created successfully');
+            //console.log('Schema created successfully');
           }
         )
     } catch(err) {

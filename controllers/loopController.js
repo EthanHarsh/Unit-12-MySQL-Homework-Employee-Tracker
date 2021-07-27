@@ -1,8 +1,12 @@
 const questions = require('./../lib/questions');
-const dynamic = require('./dynamicController');
-const eval = require('./evalController');
 const admin = require('./adminController');
 const inq = require('inquirer');
+var SqlString = require('sqlstring');
+
+const connection = require('./../server');
+const employee = require('./../lib/employeeSqlCommands');
+const department = require('./../lib/departmentSqlCommands');
+const role = require('./../lib/roleSqlCommands');
 
 const init = () => {
     inq.prompt(questions.init)
@@ -60,36 +64,158 @@ function addLoop () {
 }
 
 //Edit functions
-async function editEmployee () {
-  let question = await dynamic.employee;
-  inq.prompt(question)
-  .then((answer) => {
-      console.log(answer);
+function editEmployee () {
+  let resultsArr = []
+  connection.query(employee.getAll,
+    (err, results, fields) => {
+        console.log(results);
+        results.forEach((el) => {
+          resultsArr.push(`${el.first_name} ${el.last_name}`)
+        })
+        const question = {
+          type: 'list',
+          message: `Which employee would you like to edit?`,
+          name: 'choice',
+          suffix: ' - ',
+          choices: resultsArr
+        }
+        inq.prompt(question)
+        .then((answer) => {
+            //console.log(answer);
+            editEmployeeRole(answer.choice);
+        })
+    });
+}
+
+function editEmployeeRole(person) {
+  let resultsArr = []
+  connection.query(role.getAll,
+    (err, results, fields) => {
+        console.log(results);
+        results.forEach((el) => {
+          resultsArr.push(`${el.title}`)
+        })
+        const question = {
+          type: 'list',
+          message: `What new role should ${person} have?`,
+          name: 'choice',
+          suffix: ' - ',
+          choices: resultsArr
+        }
+        inq.prompt(question)
+        .then((answer) => {
+            getEmployeeRoleId(person, answer.choice);
+    });
   })
 }
 
-async function editDepartment () {
-  let question = await dynamic.department;
-  inq.prompt(question)
-  .then((answer) => {
-      console.log(answer);
-  })
+function getEmployeeRoleId(person, newRole) {
+  const sqlStr = SqlString.format(role.getRoleId, [newRole]);
+  connection.query(sqlStr,
+    (err, results, fields) => {
+      updateEmployeeRole(person, results[0].id)
+    }
+  )
 }
 
+function updateEmployeeRole(person, newRoleId) {
+  person = person.split(' ');
+  const sqlStr = SqlString.format(employee.updateEmployeeRole, [newRoleId, person[0], person[1]]);
+  connection.query(sqlStr,
+    (err, results, fields) => {
+      if(err) {
+        console.error(err);
+      }
+      console.log(`Employee Role Updated!`)
+      mainLoop();
+    })
+}
+
+function newEmployee() {
+
+}
+
+function newRoles() {
+
+}
+
+function newDepartment() {
+  inq.prompt(questions.newDepartment)
+  .then((answer) => {
+      //console.log(answer);
+      const sqlStr = SqlString.format(department.newDept, [answer.name])
+      connection.query(sqlStr,
+        (err, results) => {
+          if(err) {
+            console.error(err)
+          } else {
+            console.log('New Department Created!');
+            mainLoop();
+          }
+        })
+  })
+}
+/*
+function editDepartment () {
+  let resultsArr = []
+  connection.query(department.getAll,
+    (err, results, fields) => {
+        //console.log(results);
+        results.forEach((el) => {
+          resultsArr.push(`${el.name}`)
+        })
+        const question = {
+          type: 'list',
+          message: `Which department would you like to edit?`,
+          name: 'choice',
+          suffix: ' - ',
+          choices: resultsArr
+        }
+        inq.prompt(question)
+        .then((answer) => {
+            console.log(answer);
+        })
+    });
+}
+
+function editRoles () {
+  let resultsArr = []
+  connection.query(role.getAll,
+    (err, results, fields) => {
+        console.log(results);
+        results.forEach((el) => {
+          resultsArr.push(`${el.title}`)
+        })
+        const question = {
+          type: 'list',
+          message: `Which department would you like to edit?`,
+          name: 'choice',
+          suffix: ' - ',
+          choices: resultsArr
+        }
+        inq.prompt(question)
+        .then((answer) => {
+            console.log(answer);
+        })
+    });
+}
+*/
 //Eval Functions
 function checkEdit (el) {
   switch (el) {
     case 'Edit Employee':
-      edit.employee();
+      editEmployee();
       break;
+    /*
     case 'Edit Department':
-      edit.department();
+      editDepartment();
       break;
     case 'Edit Manager':
-      edit.manager();
+      editManager();
       break;
     case 'Edit Roles':
-      edit.roles();
+      editRoles();
+    */
     case 'Add New Info':
       addLoop();
       break;
@@ -104,14 +230,30 @@ function checkView(el) {
     case 'View employees by department':
       view.byDept();
       break;
+    /*  
     case 'View employees by manager':
       view.byManager();
       break;
+    */
     case 'View departments':
       view.depts();
       break
     case 'View roles':
       view.roles();
+      break
+  }
+}
+
+function checkAdd(el) {
+  switch(el) {
+    case 'New Employee':
+      newEmployee();
+      break
+    case 'New Role':
+      newRole();
+      break
+    case 'New Department':
+      newDepartment();
       break
   }
 }

@@ -18,4 +18,11 @@ connection.connect(function(err) {
     //console.log(`Let's get started...`);
 });
 
+connection.query(`USE tyrell_corp_db;`, (err, results) => {
+  if(err) {
+    console.error(err);
+    return
+  }
+})
+
 module.exports = connection;
